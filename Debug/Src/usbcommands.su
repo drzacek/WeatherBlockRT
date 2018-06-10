@@ -1,0 +1,3 @@
+usbcommands.c:91:6:DoCommand	280	static
+usbcommands.c:143:6:GetFirstWord	16	static
+usbcommands.c:26:5:DecodeCommand	264	static

@@ -1,0 +1,16 @@
+ili9341_LCD.c:97:6:ILI9341_SPI_Init	0	static
+ili9341_LCD.c:106:6:ILI9341_SPI_Send	16	static
+ili9341_LCD.c:112:6:ILI9341_Write_Command	16	static
+ili9341_LCD.c:121:6:ILI9341_Write_Data	16	static
+ili9341_LCD.c:130:6:ILI9341_Set_Address	24	static
+ili9341_LCD.c:148:6:ILI9341_Reset	8	static
+ili9341_LCD.c:158:6:ILI9341_Set_Rotation	8	static
+ili9341_LCD.c:195:6:ILI9341_Enable	0	static
+ili9341_LCD.c:201:6:ILI9341_Init	8	static
+ili9341_LCD.c:341:6:ILI9341_Draw_Colour	16	static
+ili9341_LCD.c:353:6:ILI9341_Draw_Colour_Burst	32	dynamic
+ili9341_LCD.c:397:6:ILI9341_Fill_Screen	16	static
+ili9341_LCD.c:409:6:ILI9341_Draw_Pixel	32	static
+ili9341_LCD.c:460:6:ILI9341_Draw_Rectangle	24	static
+ili9341_LCD.c:476:6:ILI9341_Draw_Horizontal_Line	16	static
+ili9341_LCD.c:488:6:ILI9341_Draw_Vertical_Line	16	static

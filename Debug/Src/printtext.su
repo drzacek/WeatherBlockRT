@@ -1,0 +1,13 @@
+printtext.c:22:6:setCurrentColor	0	static
+printtext.c:27:6:setCurrentBGColor	0	static
+printtext.c:33:6:outcharxy	40	static
+printtext.c:57:6:outtextxy	24	static
+printtext.c:69:7:get8x16index	0	static
+printtext.c:118:6:outcharxy16	40	static
+printtext.c:142:6:outtextxy16	24	static
+printtext.c:153:6:outcharxy32	40	static
+printtext.c:177:6:outtextxy32	24	static
+printtext.c:190:6:outcharxy32x	40	static
+printtext.c:216:6:outtextxy32x	32	static
+printtext.c:257:6:marquecharxy32x	40	static
+printtext.c:227:6:marquetextxy32x	32	static

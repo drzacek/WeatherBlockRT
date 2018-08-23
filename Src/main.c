@@ -51,10 +51,11 @@
 #include "stm32f1xx_hal.h"
 #include "usb_device.h"
 
-
 /* USER CODE BEGIN Includes */
 #include "myfuncs.h"
 #include "usbcommands.h"
+#include "ili9341_LCD.h"
+#include "printtext.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -65,9 +66,6 @@ SPI_HandleTypeDef hspi1;
 TIM_HandleTypeDef htim1;
 
 UART_HandleTypeDef huart1;
-
-int temp = 0;
-int humi = 0;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -95,6 +93,12 @@ void Delay_us(short us);
 
 /* USER CODE BEGIN 0 */
 
+// Fonts
+// 8x8 Font
+//extern unsigned char bgi8x8font[8*256];
+
+int temp;
+int humi;
 
 //void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //{
@@ -138,7 +142,7 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_SPI1_Init();
-  //MX_TIM1_Init();
+  MX_TIM1_Init();
   MX_USART1_UART_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
@@ -155,21 +159,65 @@ int main(void)
 
 
 
-   int check = 0;
 
+   ILI9341_Init();
+
+   HAL_Delay(500);
+
+   ILI9341_Fill_Screen(0x1863);
+   setCurrentBGColor(0x1863);
+   setCurrentColor(GREEN);
+
+   ILI9341_Set_Rotation(SCREEN_HORIZONTAL_1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
+
+   //setCurrentDate(3, 15, 8, 18);
+   //setCurrentTime(21,52,20);
+
+   unsigned char tempstring[256];
    char LED = 1;
+
+   HAL_Delay(150);
 
 
    char taskCounter = 0;
 
+
+	sprintf(tempstring, "!!!  loriland.ml !!!");
+	outtextxy32x(0, 0, tempstring, 0);
+
+	sprintf(tempstring, "Temp:");
+	outtextxy32x(2, 3, tempstring, 1);
+
+	sprintf(tempstring, "Humidity:");
+	outtextxy32x(2, 4, tempstring, 1);
+
+	short frameColor = BLUE;
+
+	//ILI9341_Draw_Rectangle(5, 50, 315, 235, WHITE);
+	ILI9341_Draw_Horizontal_Line(20, 31, 280, frameColor);
+	ILI9341_Draw_Horizontal_Line(20, 96, 280, frameColor);
+	ILI9341_Draw_Vertical_Line(300, 31, 64, frameColor);
+	ILI9341_Draw_Vertical_Line(20, 31, 64, frameColor);
+
+//	ILI9341_Draw_Horizontal_Line(20, 235, 280, frameColor);
+//	ILI9341_Draw_Horizontal_Line(20, 170, 280, frameColor);
+//	ILI9341_Draw_Vertical_Line(300, 170, 64, frameColor);
+//	ILI9341_Draw_Vertical_Line(20, 170, 64, frameColor);
+
+	ILI9341_Draw_Rectangle(20, 170, 280, 64, BLUE);
+	ILI9341_Draw_Rectangle(21, 171, 278, 62, 0x1863);
+
+	unsigned char tempHistory[220];
+
+	memset(&tempHistory, 0, 220);
+
    while (1)
    {
-	   check = 0;
 
 
 	   switch(taskCounter)
@@ -180,18 +228,20 @@ int main(void)
 			   {
 				   LED = 0;
 				   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 0);
+				   //ILI9341_Fill_Screen(CYAN);
 			   }
 			   else
 			   {
 				   LED = 1;
 				   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 1);
+				   //ILI9341_Fill_Screen(NAVY);
 			   }
 			   break;
 
 		   case 1:
 			   // DHT22
 		   	   {
-		   		   static int delayCounter = 0;
+		   		   static int delayCounter = 8;
 
 		   		   if(delayCounter == 10)
 				   {
@@ -207,26 +257,91 @@ int main(void)
 			   humi = DHT22_GetHumidity();
 			   temp = DHT22_GetTemperature();
 
+
+			   if( (temp - 220) < 0)
+				   tempHistory[0] = 0;
+			   else
+				   tempHistory[0] = (temp - 220)%60; 	// 0 at 22.0 C, max at 28.3C
 			   break;
 
 		   case 2:
 			   // RealTime Clock
 
 			   getCurrentTime();
+
 			   break;
 
 		   case 3:
-
+			   getCurrentDate();
 			   break;
 
 		   case 4:
 			   // Display
 
 
+
+
+
+			   // Time
+			   sprintf(tempstring, "%02d:%02d:%02d", dateTime.dt_hours, dateTime.dt_minutes, dateTime.dt_seconds);
+			   outtextxy32x(6, 1, tempstring, 0);
+
+			   // Date
+			   sprintf(tempstring, "%02d.%02d.%04d", dateTime.dt_day, dateTime.dt_month, dateTime.dt_year);
+			   outtextxy32x(5, 2, tempstring, 0);
+
+			   sprintf(tempstring, "%02d.%dC", temp/10, temp%10);
+			   outtextxy32x(12, 3, tempstring, 1);
+
+			   sprintf(tempstring, "%02d.%d%%", humi/10, humi%10);
+			   outtextxy32x(12, 4, tempstring, 1);
+
+			   //outtextxy32x(5, 5, "NEW XBM STRING");
+			   //outtextxy32x(5, 6, "does it look better?");
+			   /*
+			   sprintf(tempstring, "Temperature:");
+			   outtextxy(3, 18, tempstring);
+
+			   sprintf(tempstring, "Humidity:");
+			   outtextxy(3, 20, tempstring);
+
+			   sprintf(tempstring, "\xb0 C");
+			   outtextxy(23, 18, tempstring);
+
+			   sprintf(tempstring, "%%");
+			   outtextxy(23, 20, tempstring);
+
+			   sprintf(tempstring, "%02d.%d", temp/10, temp%10);
+			   outtextxy16(19, 9, tempstring);
+
+			   sprintf(tempstring, "%02d.%d", humi/10, humi%10);
+			   outtextxy16(19, 10, tempstring);
+			   */
+
 			   break;
 
 		   case 5:
 			   // MQTT
+
+			   // Temperature Graph
+
+			   // Clean graph
+				ILI9341_Draw_Rectangle(21, 171, 278, 62, 0x1863);
+
+				// Print temperature
+				for(int ti = 0; ti < 220; ti++)
+				{
+
+					ILI9341_Draw_Pixel(277 - ti, 232 - tempHistory[ti], WHITE);
+				}
+
+
+				// Shift array
+				for(int thi = 219; thi > 0; thi--)
+				{
+					tempHistory[thi] = tempHistory[thi-1];
+				}
+
 			   break;
 	   }
 
@@ -247,7 +362,9 @@ int main(void)
 		   taskCounter = 0;
 	   }
 
-	   HAL_Delay(100);
+	   HAL_Delay(20);
+
+
 
 
 
@@ -352,7 +469,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -372,9 +489,9 @@ static void MX_TIM1_Init(void)
   TIM_MasterConfigTypeDef sMasterConfig;
 
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 1;
+  htim1.Init.Prescaler = 36;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 71;
+  htim1.Init.Period = 1;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -430,13 +547,22 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct;
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13|GPIO_PIN_14, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED13_GPIO_Port, LED13_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, LCD_RESET_Pin|LCD_CS_Pin|LCD_DCRS_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : LED13_Pin */
+  GPIO_InitStruct.Pin = LED13_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED13_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : DHT22_IN_Pin */
   GPIO_InitStruct.Pin = DHT22_IN_Pin;
@@ -444,18 +570,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(DHT22_IN_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB13 PB14 */
-  GPIO_InitStruct.Pin = GPIO_PIN_13|GPIO_PIN_14;
+  /*Configure GPIO pins : LCD_RESET_Pin LCD_CS_Pin LCD_DCRS_Pin */
+  GPIO_InitStruct.Pin = LCD_RESET_Pin|LCD_CS_Pin|LCD_DCRS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-
-  // Pin 13 - LED
-  GPIO_InitStruct.Pin = GPIO_PIN_13;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 }
 

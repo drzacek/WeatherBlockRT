@@ -309,10 +309,10 @@ int setCurrentDate(int weekDay, int day, int month, int year)
 
 	uint32_t bin;
 	int addr = DS3231_ADDRESS<<1;
-	unsigned char data[4];
+	unsigned char data[5];
 	memset(data, 0, 4);
 
-	data[0] = 0x00;
+	data[0] = 0x03;
 
 //	data[1] = SecToBIN(sec);
 //	data[2] = MinToBIN(min);
@@ -321,8 +321,9 @@ int setCurrentDate(int weekDay, int day, int month, int year)
 
 	DatetoBIN(&bin, weekDay, day, month, year);
 
+	memcpy(data+1, &bin, 4);
 
-	errCheck = HAL_I2C_Master_Transmit(&hi2c1, addr, data, 4, 100);
+	errCheck = HAL_I2C_Master_Transmit(&hi2c1, addr, data, 5, 100);
 	HAL_Delay(20);
 
 		return(0);

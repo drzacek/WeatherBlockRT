@@ -59,8 +59,16 @@
 
 /* Private define ------------------------------------------------------------*/
 
+#define LED13_Pin GPIO_PIN_13
+#define LED13_GPIO_Port GPIOC
 #define DHT22_IN_Pin GPIO_PIN_12
 #define DHT22_IN_GPIO_Port GPIOB
+#define LCD_RESET_Pin GPIO_PIN_13
+#define LCD_RESET_GPIO_Port GPIOB
+#define LCD_CS_Pin GPIO_PIN_14
+#define LCD_CS_GPIO_Port GPIOB
+#define LCD_DCRS_Pin GPIO_PIN_15
+#define LCD_DCRS_GPIO_Port GPIOB
 
 /* ########################## Assert Selection ############################## */
 /**

@@ -9800,7 +9800,7 @@ ILI9341_Draw_Colour_Burst(Colour, Height);
  8003cb2:	46a8      	mov	r8, r5
 				   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 1);
  8003cb4:	f8df 9064 	ldr.w	r9, [pc, #100]	; 8003d1c <main+0x2b0>
-		   		   if(delayCounter == 10)
+		   		   if(delayCounter == 20)
  8003cb8:	4d25      	ldr	r5, [pc, #148]	; (8003d50 <main+0x2e4>)
 	   switch(taskCounter)
  8003cba:	2c05      	cmp	r4, #5
@@ -9867,9 +9867,9 @@ ILI9341_Draw_Colour_Burst(Colour, Height);
  8003d50:	20000120 	.word	0x20000120
  8003d54:	20001b1c 	.word	0x20001b1c
  8003d58:	000186a0 	.word	0x000186a0
-		   		   if(delayCounter == 10)
+		   		   if(delayCounter == 20)
  8003d5c:	682b      	ldr	r3, [r5, #0]
- 8003d5e:	2b0a      	cmp	r3, #10
+ 8003d5e:	2b14      	cmp	r3, #20
  8003d60:	d105      	bne.n	8003d6e <main+0x302>
 		   			   delayCounter = 0;
  8003d62:	2300      	movs	r3, #0

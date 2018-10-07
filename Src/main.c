@@ -241,9 +241,9 @@ int main(void)
 		   case 1:
 			   // DHT22
 		   	   {
-		   		   static int delayCounter = 8;
+		   		   static int delayCounter = 19;
 
-		   		   if(delayCounter == 10)
+		   		   if(delayCounter == 20)
 				   {
 		   			   delayCounter = 0;
 
